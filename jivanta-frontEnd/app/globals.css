@@ -4,28 +4,31 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 42 38% 91%; /* Warm Beige (#ECE3CE) */
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 42 38% 91%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%;
+    --popover: 42 38% 91%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 142 76% 36%; /* Green */
-    --primary-foreground: 210 40% 98%;
+    --primary: 133 18% 26%; /* Deep Green (#3A4D39) */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 260 100% 60%; /* Violet Blue */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 110 18% 37%; /* Muted Olive Green (#4F6F52) */
+    --secondary-foreground: 0 0% 100%; /* White */
 
-    --highlight: 25 100% 50%; /* Orange */
-    --highlight-foreground: 210 40% 98%;
+    --tertiary: 136 21% 53%; /* Soft Sage Green (#739072) */
+    --tertiary-foreground: 0 0% 100%; /* White */
 
-    --muted: 210 40% 96.1%;
+    --muted: 42 38% 91%; /* Warm Beige (#ECE3CE) */
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --highlight: 25 100% 50%; /* Orange */
+    --highlight-foreground: 0 0% 100%;
+
+    --accent: 110 18% 37%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -48,19 +51,22 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 142 76% 36%; /* Green */
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 133 18% 26%; /* Deep Green (#3A4D39) */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 260 100% 60%; /* Violet Blue */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 110 18% 37%; /* Muted Olive Green (#4F6F52) */
+    --secondary-foreground: 0 0% 100%; /* White */
+
+    --tertiary: 136 21% 53%; /* Soft Sage Green (#739072) */
+    --tertiary-foreground: 0 0% 100%; /* White */
+
+    --muted: 42 38% 91%; /* Warm Beige (#ECE3CE) */
+    --muted-foreground: 215.4 16.3% 46.9%;
 
     --highlight: 25 100% 50%; /* Orange */
-    --highlight-foreground: 222.2 47.4% 11.2%;
+    --highlight-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 110 18% 37%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -80,4 +86,3 @@
     @apply bg-background text-foreground;
   }
 }
-

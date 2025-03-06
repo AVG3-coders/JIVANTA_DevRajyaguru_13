@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export function Header() {
   return (
-    <header className="w-full py-4 px-6 bg-secondary text-white">
+    <header className="w-full py-4 px-6 bg-primary/80 text-white">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold">
           MediShop
@@ -27,7 +27,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link href="/login">
             <Button variant="highlight" className="rounded-full">
-              Contact
+              login/register
             </Button>
           </Link>
         </div>
