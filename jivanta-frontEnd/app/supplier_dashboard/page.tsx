@@ -253,11 +253,20 @@ export default function SupplierDashboard() {
                 Orders
               </button>
             </li>
+            <li>
+              <button 
+                onClick={() => setActiveTab("customers")}
+                className={`flex items-center w-full px-4 py-2 text-sm rounded-md ${activeTab === "customers" ? "bg-primary/10 text-primary font-medium" : "text-gray-600 hover:bg-gray-100"}`}
+              >
+                <Users className="h-5 w-5 mr-3" />
+                Customers
+              </button>
+            </li>
           </ul>
           
           <div className="mt-8 pt-4 border-t">
             <ul className="space-y-1">
-            
+              
               <li>
                 <Link href="/" className="flex items-center px-4 py-2 text-sm rounded-md text-gray-600 hover:bg-gray-100">
                   <LogOut className="h-5 w-5 mr-3" />
@@ -278,11 +287,13 @@ export default function SupplierDashboard() {
               {activeTab === "overview" && "Dashboard Overview"}
               {activeTab === "medicines" && "Medicine Management"}
               {activeTab === "orders" && "Order History"}
+              {activeTab === "customers" && "Customer Management"}
               {activeTab === "settings" && "Account Settings"}
             </h2>
           </div>
           
           <div className="flex items-center space-x-4">
+            
             <div className="flex items-center">
               <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
                 <span className="font-medium text-sm">PL</span>

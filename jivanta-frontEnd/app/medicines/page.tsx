@@ -3,175 +3,209 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, ShoppingCart, Filter, CheckCircle, X, ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+interface Medicine {
+  id: string | number;
+  name: string;
+  description: string;
+  brand: string;
+  category: string;
+  price: number;
+  rating: number;
+  genericName?: string;
+  images?: string[];
+  image?: string;
+  dosage?: string;
+  prescription?: boolean;
+}
+import {
+  Search,
+  ShoppingCart,
+  Filter,
+  CheckCircle,
+  X,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-
-// Mock medicine data
-const medicinesData = [
-  {
-    id: "paracetamol-500",
-    name: "Paracetamol 500mg",
-    description: "Fast pain relief for headaches and fever",
-    price: 9.99,
-    image: "/assets/products/paracetamol-1.jpg",
-    brand: "MediCorp",
-    category: "Pain Relief",
-    rating: 4.5,
-    prescription: false
-  },
-  {
-    id: "ibuprofen-400",
-    name: "Ibuprofen 400mg",
-    description: "Anti-inflammatory pain reliever",
-    price: 11.50,
-    image: "/assets/products/ibuprofen-1.jpg",
-    brand: "HealthPlus",
-    category: "Pain Relief",
-    rating: 4.2,
-    prescription: false
-  },
-  {
-    id: "amoxicillin-500",
-    name: "Amoxicillin 500mg",
-    description: "Antibiotic for bacterial infections",
-    price: 24.99,
-    image: "/placeholder.svg",
-    brand: "PharmaGlobal",
-    category: "Antibiotics",
-    rating: 4.8,
-    prescription: true
-  },
-  {
-    id: "lipitor-20",
-    name: "Lipitor 20mg",
-    description: "Manages cholesterol levels",
-    price: 49.99,
-    image: "/placeholder.svg",
-    brand: "PharmaGlobal",
-    category: "Cardiovascular",
-    rating: 4.7,
-    prescription: true
-  },
-  {
-    id: "vitamin-d-1000",
-    name: "Vitamin D3 1000 IU",
-    description: "Supports bone health and immunity",
-    price: 12.99,
-    image: "/placeholder.svg",
-    brand: "NutriLife",
-    category: "Vitamins",
-    rating: 4.9,
-    prescription: false
-  },
-  {
-    id: "metformin-500",
-    name: "Metformin 500mg",
-    description: "Manages blood sugar levels in diabetes",
-    price: 18.50,
-    image: "/placeholder.svg",
-    brand: "HealthPlus",
-    category: "Diabetes",
-    rating: 4.3,
-    prescription: true
-  },
-  {
-    id: "loratadine-10",
-    name: "Loratadine 10mg",
-    description: "Non-drowsy allergy relief",
-    price: 14.75,
-    image: "/placeholder.svg",
-    brand: "MediCorp",
-    category: "Allergies",
-    rating: 4.6,
-    prescription: false
-  },
-  {
-    id: "multivitamin-daily",
-    name: "Daily Multivitamin",
-    description: "Complete daily nutritional support",
-    price: 15.99,
-    image: "/placeholder.svg",
-    brand: "NutriLife",
-    category: "Vitamins",
-    rating: 4.4,
-    prescription: false
-  }
-];
-
-// Get unique categories and brands
-const categories = [...new Set(medicinesData.map(medicine => medicine.category))];
-const brands = [...new Set(medicinesData.map(medicine => medicine.brand))];
+import { useCart } from "@/lib/cart";
 
 export default function MedicinesPage() {
   const router = useRouter();
+  const { addItem } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [minRating, setMinRating] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [filteredMedicines, setFilteredMedicines] = useState(medicinesData);
+  const [medicinesData, setMedicinesData] = useState<Medicine[]>([]);
+  const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
-
-  // Handle search and filtering
+  const [categories, setCategories] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
+  
+  // Fetch medicines on load
   useEffect(() => {
-    setIsLoading(true);
+    const fetchMedicines = async () => {
+      try {
+        const response = await fetch('/api/medicines');
+        if (!response.ok) {
+          throw new Error('Failed to fetch medicines');
+        }
+        const data = await response.json();
+        setMedicinesData(data);
+        setFilteredMedicines(data);
+        
+        // Extract categories and brands
+        const uniqueCategories = [...new Set(data.map((medicine: any) => medicine.category))] as string[];
+        const uniqueBrands = [...new Set(data.map((medicine: any) => medicine.brand))] as string[];
+        
+        setCategories(uniqueCategories);
+        setBrands(uniqueBrands);
+      } catch (error) {
+        console.error('Error fetching medicines:', error);
+        
+        // Fallback to local data in case API fails
+        try {
+          const fallbackResponse = await fetch('/db.json');
+          const fallbackData = await fallbackResponse.json();
+          setMedicinesData(fallbackData.medicines);
+          setFilteredMedicines(fallbackData.medicines);
+          
+          // Extract categories and brands from fallback data
+          const uniqueCategories = [...new Set(fallbackData.medicines.map((medicine: any) => medicine.category))] as string[];
+          const uniqueBrands = [...new Set(fallbackData.medicines.map((medicine: any) => medicine.brand))] as string[];
+          
+          setCategories(uniqueCategories);
+          setBrands(uniqueBrands);
+        } catch (fallbackError) {
+          console.error('Fallback data loading failed:', fallbackError);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Simulate API loading delay
+    fetchMedicines();
+  }, []);
+  
+  // Handle filtering with API
+  useEffect(() => {
+    const fetchFilteredMedicines = async () => {
+      if (!medicinesData.length) return;
+      
+      setIsLoading(true);
+      
+      try {
+        // Build query params
+        const params = new URLSearchParams();
+        
+        if (searchQuery) params.append('search', searchQuery);
+        if (activeCategory) params.append('category', activeCategory);
+        if (selectedBrands.length) {
+          selectedBrands.forEach(brand => params.append('brand', brand));
+        }
+        if (priceMin) params.append('minPrice', priceMin);
+        if (priceMax) params.append('maxPrice', priceMax);
+        if (minRating) params.append('minRating', minRating.toString());
+        
+        // If we have params, fetch filtered data
+        if (params.toString()) {
+          const response = await fetch(`/api/medicines?${params}`);
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch filtered medicines');
+          }
+          
+          const data = await response.json();
+          setFilteredMedicines(data);
+        } else {
+          // No filters, use all medicines
+          setFilteredMedicines(medicinesData);
+        }
+      } catch (error) {
+        console.error('Error filtering medicines:', error);
+        
+        // Fallback to client-side filtering if API fails
+        let results = [...medicinesData];
+
+        // Apply search query filter
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          results = results.filter(
+            (medicine: any) =>
+              medicine.name.toLowerCase().includes(query) ||
+              medicine.description.toLowerCase().includes(query) ||
+              medicine.brand.toLowerCase().includes(query)
+          );
+        }
+
+        // Apply category filter
+        if (activeCategory) {
+          results = results.filter(
+            (medicine: any) => medicine.category === activeCategory
+          );
+        }
+
+        // Apply brand filter
+        if (selectedBrands.length > 0) {
+          results = results.filter((medicine: any) =>
+            selectedBrands.includes(medicine.brand)
+          );
+        }
+
+        // Apply price range filter
+        if (priceMin !== "") {
+          results = results.filter(
+            (medicine: any) => medicine.price >= parseFloat(priceMin)
+          );
+        }
+
+        if (priceMax !== "") {
+          results = results.filter(
+            (medicine: any) => medicine.price <= parseFloat(priceMax)
+          );
+        }
+
+        // Apply rating filter
+        if (minRating !== null) {
+          results = results.filter((medicine: any) => medicine.rating >= minRating);
+        }
+
+        setFilteredMedicines(results);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    // Add delay for typing
     const timer = setTimeout(() => {
-      let results = [...medicinesData];
-      
-      // Apply search query filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        results = results.filter(medicine => 
-          medicine.name.toLowerCase().includes(query) || 
-          medicine.description.toLowerCase().includes(query) ||
-          medicine.brand.toLowerCase().includes(query)
-        );
-      }
-      
-      // Apply category filter
-      if (activeCategory) {
-        results = results.filter(medicine => medicine.category === activeCategory);
-      }
-      
-      // Apply brand filter
-      if (selectedBrands.length > 0) {
-        results = results.filter(medicine => selectedBrands.includes(medicine.brand));
-      }
-      
-      // Apply price range filter
-      if (priceMin !== "") {
-        results = results.filter(medicine => medicine.price >= parseFloat(priceMin));
-      }
-      
-      if (priceMax !== "") {
-        results = results.filter(medicine => medicine.price <= parseFloat(priceMax));
-      }
-      
-      // Apply rating filter
-      if (minRating !== null) {
-        results = results.filter(medicine => medicine.rating >= minRating);
-      }
-      
-      setFilteredMedicines(results);
-      setIsLoading(false);
-    }, 600);
+      fetchFilteredMedicines();
+    }, 500);
     
     return () => clearTimeout(timer);
-  }, [searchQuery, activeCategory, selectedBrands, priceMin, priceMax, minRating]);
+  }, [searchQuery, activeCategory, selectedBrands, priceMin, priceMax, minRating, medicinesData]);
 
+  // Rest of your code remains the same
+  
+  // Format price to Indian Rupees
+  const formatIndianPrice = (price: number): string => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+  
   // Handle brand selection
   const toggleBrand = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) 
-        ? prev.filter(b => b !== brand) 
-        : [...prev, brand]
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
     );
   };
 
@@ -186,30 +220,18 @@ export default function MedicinesPage() {
   };
 
   // Handle add to cart
-  const addToCart = (medicine: typeof medicinesData[0]) => {
-    // Get existing cart
-    const cartItems = JSON.parse(localStorage.getItem("cartItems") || "[]");
-    
-    // Check if product already in cart
-    const existingItemIndex = cartItems.findIndex((item: any) => item.id === medicine.id);
-    
-    if (existingItemIndex >= 0) {
-      // Update quantity if product already in cart
-      cartItems[existingItemIndex].quantity += 1;
-    } else {
-      // Add new product to cart
-      cartItems.push({
-        id: medicine.id,
-        name: medicine.name,
-        price: medicine.price,
-        image: medicine.image,
-        quantity: 1
-      });
-    }
-    
-    // Save updated cart
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    
+  const addToCart = (medicine: any) => {
+    // Convert medicine to cart item format and add to cart
+    addItem({
+      id: medicine.id,
+      name: medicine.name,
+      genericName: medicine.genericName || medicine.name.split(" ")[0],
+      image: medicine.images?.[0] || medicine.image || "/assets/medicines/medicine.jpeg",
+      price: medicine.price,
+      dosage: medicine.dosage || (medicine.name.split(" ").length > 1 ? medicine.name.split(" ")[1] : ""),
+      prescription: medicine.prescription || false,
+    });
+
     // Show added confirmation
     setAddedToCart(medicine.id);
     setTimeout(() => setAddedToCart(null), 2000);
@@ -224,7 +246,11 @@ export default function MedicinesPage() {
     setActiveCategory(null);
   };
 
+  // The JSX render remains mostly the same
+  // Just ensure image paths are correctly referenced
+  
   return (
+    // Your existing JSX with fixed image references
     <div className="min-h-screen bg-primary/5">
       <div className="container mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -244,7 +270,7 @@ export default function MedicinesPage() {
 
         {/* Mobile filter button */}
         <div className="md:hidden mb-4">
-          <Button 
+          <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className="w-full flex justify-between items-center"
@@ -252,19 +278,27 @@ export default function MedicinesPage() {
             <span className="flex items-center">
               <Filter className="h-4 w-4 mr-2" /> Filters
             </span>
-            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
         </div>
 
         <div className="grid grid-cols-12 gap-6">
           {/* Filter Section */}
-          <div className={`col-span-12 md:col-span-3 bg-white rounded-lg shadow-sm p-6 ${showFilters ? 'block' : 'hidden'} md:block`}>
+          <div
+            className={`col-span-12 md:col-span-3 bg-white rounded-lg shadow-sm p-6 ${
+              showFilters ? "block" : "hidden"
+            } md:block`}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Filters</h3>
-              
-              <Button 
-                variant="ghost" 
-                size="sm" 
+
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={resetFilters}
                 className="text-xs text-muted-foreground hover:text-foreground"
               >
@@ -276,17 +310,17 @@ export default function MedicinesPage() {
               <div>
                 <h4 className="text-sm font-medium mb-3">Price Range</h4>
                 <div className="flex gap-2">
-                  <Input 
-                    type="number" 
-                    placeholder="Min" 
-                    className="w-full" 
+                  <Input
+                    type="number"
+                    placeholder="Min"
+                    className="w-full"
                     value={priceMin}
                     onChange={(e) => setPriceMin(e.target.value)}
                   />
-                  <Input 
-                    type="number" 
-                    placeholder="Max" 
-                    className="w-full" 
+                  <Input
+                    type="number"
+                    placeholder="Max"
+                    className="w-full"
                     value={priceMax}
                     onChange={(e) => setPriceMax(e.target.value)}
                   />
@@ -298,9 +332,9 @@ export default function MedicinesPage() {
                 <div className="space-y-2">
                   {brands.map((brand) => (
                     <div key={brand} className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id={brand} 
+                      <input
+                        type="checkbox"
+                        id={brand}
                         className="mr-2"
                         checked={selectedBrands.includes(brand)}
                         onChange={() => toggleBrand(brand)}
@@ -332,11 +366,16 @@ export default function MedicinesPage() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="pt-4 border-t">
-                <p className="text-xs text-muted-foreground mb-2">Showing {filteredMedicines.length} of {medicinesData.length} products</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Showing {filteredMedicines.length} of {medicinesData.length}{" "}
+                  products
+                </p>
                 {filteredMedicines.length === 0 && !isLoading && (
-                  <p className="text-xs text-red-500">No matches found. Try adjusting your filters.</p>
+                  <p className="text-xs text-red-500">
+                    No matches found. Try adjusting your filters.
+                  </p>
                 )}
               </div>
             </div>
@@ -345,17 +384,19 @@ export default function MedicinesPage() {
           {/* Products Grid */}
           <div className="col-span-12 md:col-span-9 space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-              <Button 
-                variant={activeCategory === null ? "secondary" : "outline"} 
+              <Button
+                variant={activeCategory === null ? "secondary" : "outline"}
                 className="rounded-full"
                 onClick={() => setActiveCategory(null)}
               >
                 All
               </Button>
-              {categories.map(category => (
-                <Button 
-                  key={category} 
-                  variant={activeCategory === category ? "secondary" : "outline"} 
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={
+                    activeCategory === category ? "secondary" : "outline"
+                  }
                   className="bg-white rounded-full text-sm"
                   onClick={() => toggleCategory(category)}
                 >
@@ -382,7 +423,11 @@ export default function MedicinesPage() {
                     <Link href={`/product/${medicine.id}`} className="block">
                       <div className="aspect-square relative bg-gray-100">
                         <Image
-                          src={medicine.image || "/placeholder.svg"}
+                          src={
+                            medicine.images?.[0] || 
+                            medicine.image || 
+                            "/assets/medicines/medicine.jpeg"
+                          }
                           alt={medicine.name}
                           fill
                           className="object-contain p-4"
@@ -406,12 +451,16 @@ export default function MedicinesPage() {
                           Brand: {medicine.brand}
                         </p>
                       </Link>
-                      
+
                       <div className="flex mb-2">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <svg
                             key={star}
-                            className={`w-4 h-4 ${star <= Math.floor(medicine.rating) ? "text-highlight" : "text-gray-300"}`}
+                            className={`w-4 h-4 ${
+                              star <= Math.floor(medicine.rating)
+                                ? "text-highlight"
+                                : "text-gray-300"
+                            }`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -422,10 +471,10 @@ export default function MedicinesPage() {
                           {medicine.rating.toFixed(1)}
                         </span>
                       </div>
-                      
+
                       <div className="flex justify-between items-center">
                         <span className="font-semibold text-highlight">
-                          ${medicine.price.toFixed(2)}
+                          {formatIndianPrice(medicine.price)}
                         </span>
                         <Button
                           variant="secondary"
@@ -455,7 +504,9 @@ export default function MedicinesPage() {
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                     <X className="h-8 w-8 text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">No medicines found</h3>
+                  <h3 className="text-lg font-medium mb-2">
+                    No medicines found
+                  </h3>
                   <p className="text-muted-foreground mb-6">
                     We couldn't find any medicines matching your criteria.
                   </p>

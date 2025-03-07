@@ -39,12 +39,7 @@ export function Header() {
           >
             About Project
           </Link>
-          <Link
-            href="/about_us"
-            className="hover:text-white/80 transition-colors"
-          >
-            About Us
-          </Link>
+         
         </nav>
 
         <div className="flex items-center gap-3">
@@ -78,9 +73,7 @@ export function Header() {
               className="rounded-full w-10 h-10 relative"
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-highlight text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {isLoggedIn ? "3" : "0"}
-              </span>
+              
             </Button>
           </Link>
         </div>

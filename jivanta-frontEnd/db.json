@@ -1,0 +1,356 @@
+{
+    "medicines": [
+      {
+        "id": "paracetamol-500",
+        "name": "Paracetamol 500mg",
+        "genericName": "Acetaminophen",
+        "brand": "MediCorp",
+        "price": 9.99,
+        "category": "Pain Relief",
+        "prescription": false,
+        "activeIngredients": "Acetaminophen 500mg",
+        "description": "Fast pain relief for headaches and fever",
+        "images": [
+          "/assets/products/paracetamol-1.jpg",
+          "/assets/products/paracetamol-2.jpg"
+        ],
+        "dosage": "Adults: 1-2 tablets every 4-6 hours as needed, not exceeding 8 tablets in 24 hours",
+        "usage": "Take with a full glass of water. Can be taken with or without food.",
+        "storage": "Store at room temperature away from moisture and heat (15-30°C)",
+        "warnings": "Do not exceed recommended dose. Avoid alcohol. Consult doctor if symptoms persist for more than 3 days.",
+        "sideEffects": "Rare side effects may include nausea, stomach pain, and allergic reactions.",
+        "interactions": "May interact with warfarin and liver medications. Consult your doctor if taking other medications.",
+        "stock": 180,
+        "supplierId": "pharm-global-123",
+        "rating": 4.5,
+        "sales": 1245
+      },
+      {
+        "id": "ibuprofen-400",
+        "name": "Ibuprofen 400mg",
+        "genericName": "Ibuprofen",
+        "brand": "HealthPlus",
+        "price": 11.50,
+        "category": "Pain Relief",
+        "prescription": false,
+        "activeIngredients": "Ibuprofen 400mg",
+        "description": "Anti-inflammatory pain reliever",
+        "images": [
+          "/assets/products/ibuprofen-1.jpg"
+        ],
+        "dosage": "Adults: 1 tablet every 6-8 hours as needed, not exceeding 3 tablets in 24 hours",
+        "usage": "Take with food or milk to prevent stomach upset",
+        "storage": "Store at room temperature away from moisture",
+        "warnings": "May increase risk of heart attack or stroke. Not recommended for use during pregnancy.",
+        "sideEffects": "May cause stomach pain, heartburn, nausea, headache, dizziness",
+        "interactions": "Interacts with aspirin, blood thinners, and some blood pressure medications",
+        "stock": 120,
+        "supplierId": "health-plus-456",
+        "rating": 4.2,
+        "sales": 987
+      },
+      {
+        "id": "amoxicillin-500",
+        "name": "Amoxicillin 500mg",
+        "genericName": "Amoxicillin",
+        "brand": "PharmaGlobal",
+        "price": 24.99,
+        "category": "Antibiotics",
+        "prescription": true,
+        "activeIngredients": "Amoxicillin trihydrate equivalent to amoxicillin 500mg",
+        "description": "Antibiotic for bacterial infections",
+        "images": ["/placeholder.svg"],
+        "dosage": "Adults: 1 capsule every 8 hours or as directed by your doctor",
+        "usage": "Take at evenly spaced intervals, complete the full course as prescribed",
+        "storage": "Store at room temperature away from moisture and heat",
+        "warnings": "May cause allergic reactions. Notify your doctor if you have a penicillin allergy.",
+        "sideEffects": "Diarrhea, stomach pain, nausea, vomiting, rash, headache",
+        "interactions": "May reduce effectiveness of birth control pills",
+        "stock": 85,
+        "supplierId": "pharm-global-123",
+        "rating": 4.8,
+        "sales": 645
+      },
+      {
+        "id": "lipitor-20",
+        "name": "Lipitor 20mg",
+        "genericName": "Atorvastatin",
+        "brand": "PharmaGlobal",
+        "price": 49.99,
+        "category": "Cardiovascular",
+        "prescription": true,
+        "activeIngredients": "Atorvastatin calcium equivalent to 20mg",
+        "description": "Manages cholesterol levels",
+        "images": ["/placeholder.svg"],
+        "dosage": "Adults: Usually 1 tablet daily or as directed by your doctor",
+        "usage": "Take at the same time each day, with or without food",
+        "storage": "Store at room temperature away from moisture and heat",
+        "warnings": "Report muscle pain or weakness to your doctor immediately",
+        "sideEffects": "Muscle pain, joint pain, diarrhea, mild nausea",
+        "interactions": "Interacts with grapefruit juice and certain antibiotics",
+        "stock": 70,
+        "supplierId": "pharm-global-123",
+        "rating": 4.7,
+        "sales": 432
+      },
+      {
+        "id": "vitamin-d-1000",
+        "name": "Vitamin D3 1000 IU",
+        "genericName": "Cholecalciferol",
+        "brand": "NutriLife",
+        "price": 12.99,
+        "category": "Vitamins",
+        "prescription": false,
+        "activeIngredients": "Vitamin D3 (Cholecalciferol) 1000 IU",
+        "description": "Supports bone health and immunity",
+        "images": ["/placeholder.svg"],
+        "dosage": "Adults: 1 capsule daily with food",
+        "usage": "Take with a meal for better absorption",
+        "storage": "Store in a cool, dry place away from direct sunlight",
+        "warnings": "Do not exceed recommended dose without consulting your doctor",
+        "sideEffects": "Rare at recommended doses. Excessive use may cause nausea, vomiting, weakness",
+        "interactions": "May interact with certain heart medications and steroids",
+        "stock": 200,
+        "supplierId": "nutri-life-789",
+        "rating": 4.9,
+        "sales": 1560
+      }
+    ],
+    "users": {
+      "doctors": [
+        {
+          "id": "doc-123",
+          "name": "Dr. Anil Sharma",
+          "email": "anil.sharma@example.com",
+          "phone": "9876543210",
+          "licenseNumber": "MCI-12345-A",
+          "degree": "MBBS, MD",
+          "specialization": "General Medicine",
+          "location": "Chennai",
+          "clinic": "HealthFirst Clinic",
+          "verified": true,
+          "joinDate": "2023-05-15",
+          "ordersPlaced": 42,
+          "totalSpent": 24800
+        },
+        {
+          "id": "doc-456",
+          "name": "Dr. Priya Patel",
+          "email": "priya.patel@example.com",
+          "phone": "8765432109",
+          "licenseNumber": "MCI-67890-B",
+          "degree": "MBBS, MS",
+          "specialization": "Pediatrics",
+          "location": "Bangalore",
+          "clinic": "Child Care Center",
+          "verified": true,
+          "joinDate": "2023-07-22",
+          "ordersPlaced": 28,
+          "totalSpent": 18500
+        }
+      ],
+      "suppliers": [
+        {
+          "id": "pharm-global-123",
+          "companyName": "PharmaGlobal Ltd.",
+          "email": "contact@pharmaglobal.com",
+          "phone": "9876543210",
+          "registrationNumber": "CIN12345678",
+          "gstNumber": "22AAAAA0000A1Z5",
+          "drugLicenseNumber": "MH-BLO-123456",
+          "cdscoNumber": "CDSCO-12345-AB",
+          "location": "Mumbai",
+          "verified": true,
+          "joinDate": "2023-01-10",
+          "productsListed": 24,
+          "totalSales": 387500
+        },
+        {
+          "id": "health-plus-456",
+          "companyName": "HealthPlus Pharma",
+          "email": "info@healthplus.com",
+          "phone": "8765432109",
+          "registrationNumber": "CIN87654321",
+          "gstNumber": "24BBBBB1111B1Z8",
+          "drugLicenseNumber": "DL-BLO-789012",
+          "cdscoNumber": "CDSCO-67890-CD",
+          "location": "Ahmedabad",
+          "verified": true,
+          "joinDate": "2023-02-15",
+          "productsListed": 18,
+          "totalSales": 245300
+        },
+        {
+          "id": "nutri-life-789",
+          "companyName": "NutriLife Supplements",
+          "email": "contact@nutrilife.com",
+          "phone": "7654321098",
+          "registrationNumber": "CIN76543210",
+          "gstNumber": "29CCCCC2222C1Z2",
+          "drugLicenseNumber": "KA-BLO-345678",
+          "cdscoNumber": "CDSCO-24680-EF",
+          "location": "Bangalore",
+          "verified": true,
+          "joinDate": "2023-03-22",
+          "productsListed": 12,
+          "totalSales": 198750
+        }
+      ]
+    },
+    "orders": [
+      {
+        "id": "ORD-001-2023",
+        "doctorId": "doc-123",
+        "items": [
+          {
+            "medicineId": "paracetamol-500",
+            "name": "Paracetamol 500mg",
+            "quantity": 5,
+            "price": 9.99
+          },
+          {
+            "medicineId": "ibuprofen-400",
+            "name": "Ibuprofen 400mg",
+            "quantity": 3,
+            "price": 11.50
+          }
+        ],
+        "totalAmount": 84.45,
+        "status": "delivered",
+        "paymentMethod": "online",
+        "orderDate": "2023-11-15T10:30:00",
+        "deliveryDate": "2023-11-18T14:45:00",
+        "shippingAddress": {
+          "clinic": "HealthFirst Clinic",
+          "street": "123 Main St",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "pincode": "600001"
+        }
+      },
+      {
+        "id": "ORD-002-2023",
+        "doctorId": "doc-456",
+        "items": [
+          {
+            "medicineId": "amoxicillin-500",
+            "name": "Amoxicillin 500mg",
+            "quantity": 2,
+            "price": 24.99
+          },
+          {
+            "medicineId": "vitamin-d-1000",
+            "name": "Vitamin D3 1000 IU",
+            "quantity": 1,
+            "price": 12.99
+          }
+        ],
+        "totalAmount": 62.97,
+        "status": "processing",
+        "paymentMethod": "cod",
+        "orderDate": "2023-12-05T15:20:00",
+        "deliveryDate": null,
+        "shippingAddress": {
+          "clinic": "Child Care Center",
+          "street": "456 Park Avenue",
+          "city": "Bangalore",
+          "state": "Karnataka",
+          "pincode": "560001"
+        }
+      }
+    ],
+    "reviews": [
+      {
+        "id": "rev-001",
+        "medicineId": "paracetamol-500",
+        "doctorId": "doc-123",
+        "doctorName": "Dr. Anil Sharma",
+        "rating": 4,
+        "comment": "Works great for headaches and fever. I always keep this in my medicine cabinet.",
+        "date": "2023-12-15"
+      },
+      {
+        "id": "rev-002",
+        "medicineId": "paracetamol-500",
+        "doctorId": "doc-456",
+        "doctorName": "Dr. Priya Patel",
+        "rating": 5,
+        "comment": "Very effective and fast-acting. Helps with occasional migraines in children too.",
+        "date": "2024-01-20"
+      },
+      {
+        "id": "rev-003",
+        "medicineId": "ibuprofen-400",
+        "doctorId": "doc-123",
+        "doctorName": "Dr. Anil Sharma",
+        "rating": 4,
+        "comment": "Works well for inflammation and pain relief. Takes about 30 minutes to kick in.",
+        "date": "2023-11-05"
+      }
+    ],
+    "stats": {
+      "sales": {
+        "monthly": [
+          {"month": "Jan", "amount": 42500},
+          {"month": "Feb", "amount": 38700},
+          {"month": "Mar", "amount": 52300},
+          {"month": "Apr", "amount": 49800},
+          {"month": "May", "amount": 58200},
+          {"month": "Jun", "amount": 62400},
+          {"month": "Jul", "amount": 54900},
+          {"month": "Aug", "amount": 67500},
+          {"month": "Sep", "amount": 72300},
+          {"month": "Oct", "amount": 68400},
+          {"month": "Nov", "amount": 84500},
+          {"month": "Dec", "amount": 92700}
+        ],
+        "categories": [
+          {"name": "Pain Relief", "amount": 245300},
+          {"name": "Antibiotics", "amount": 182500},
+          {"name": "Cardiovascular", "amount": 136700},
+          {"name": "Vitamins", "amount": 98400},
+          {"name": "Diabetes", "amount": 72800},
+          {"name": "Allergies", "amount": 42900}
+        ]
+      },
+      "suppliers": {
+        "performance": [
+          {"name": "PharmaGlobal Ltd.", "sales": 387500, "products": 24, "rating": 4.7},
+          {"name": "HealthPlus Pharma", "sales": 245300, "products": 18, "rating": 4.2},
+          {"name": "NutriLife Supplements", "sales": 198750, "products": 12, "rating": 4.9}
+        ]
+      },
+      "doctors": {
+        "activity": [
+          {"date": "2024-02-01", "orders": 12},
+          {"date": "2024-02-02", "orders": 8},
+          {"date": "2024-02-03", "orders": 14},
+          {"date": "2024-02-04", "orders": 10},
+          {"date": "2024-02-05", "orders": 15},
+          {"date": "2024-02-06", "orders": 9},
+          {"date": "2024-02-07", "orders": 11}
+        ],
+        "specialization": [
+          {"name": "General Medicine", "count": 18},
+          {"name": "Pediatrics", "count": 12},
+          {"name": "Cardiology", "count": 7},
+          {"name": "Neurology", "count": 5},
+          {"name": "Orthopedics", "count": 8}
+        ]
+      },
+      "inventory": {
+        "status": [
+          {"status": "In Stock", "count": 48},
+          {"status": "Low Stock", "count": 12},
+          {"status": "Out of Stock", "count": 3}
+        ],
+        "topSelling": [
+          {"name": "Vitamin D3", "sales": 1560},
+          {"name": "Paracetamol", "sales": 1245},
+          {"name": "Ibuprofen", "sales": 987},
+          {"name": "Amoxicillin", "sales": 645},
+          {"name": "Atorvastatin", "sales": 432}
+        ]
+      }
+    }
+  }

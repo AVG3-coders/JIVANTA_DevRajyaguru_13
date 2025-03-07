@@ -3,300 +3,268 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Minus, Plus, ShoppingBag, Trash2, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Mock product data
-const initialCartItems = [
-  {
-    id: "med-1",
-    name: "Amoxicillin",
-    genericName: "Amoxicillin Trihydrate",
-    image: "/placeholder.svg",
-    price: 29.99,
-    quantity: 1,
-    dosage: "500mg",
-    instructions: "Take 1 tablet three times daily after meals",
-  },
-  {
-    id: "med-2",
-    name: "Lisinopril",
-    genericName: "Lisinopril Dihydrate",
-    image: "/placeholder.svg",
-    price: 19.5,
-    quantity: 2,
-    dosage: "10mg",
-    instructions: "Take 1 tablet daily in the morning",
-  },
-  {
-    id: "med-3",
-    name: "Vitamin D3",
-    genericName: "Cholecalciferol",
-    image: "/placeholder.svg",
-    price: 12.99,
-    quantity: 1,
-    dosage: "1000 IU",
-    instructions: "Take 1 capsule daily with food",
-  },
-];
+import {
+  useCart,
+  formatPrice,
+  calculateTax,
+  calculateShipping,
+  calculateTotal,
+  requiresPrescription,
+} from "@/lib/cart";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const { items, removeItem, updateQuantity, clearCart, getSubtotal } =
+    useCart();
+  const [loading, setLoading] = useState(true);
 
-  // Calculate cart summary
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const shipping = subtotal > 50 ? 0 : 4.99;
-  const tax = subtotal * 0.08; // 8% tax
-  const total = subtotal + shipping + tax;
+  // Calculate order values
+  const subtotal = getSubtotal();
+  const tax = calculateTax(subtotal);
+  const shipping = calculateShipping(subtotal);
+  const total = calculateTotal(subtotal);
+  const needsPrescription = requiresPrescription(items);
 
-  // Simulate loading
   useEffect(() => {
+    // Simulate loading data
     const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+      setLoading(false);
+    }, 600);
+
     return () => clearTimeout(timer);
   }, []);
 
-  // Update item quantity
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
-
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
+  const handleIncreaseQuantity = (id: string, currentQty: number) => {
+    updateQuantity(id, currentQty + 1);
   };
 
-  // Remove item from cart
-  const removeItem = (id: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  const handleDecreaseQuantity = (id: string, currentQty: number) => {
+    if (currentQty > 1) {
+      updateQuantity(id, currentQty - 1);
+    } else {
+      removeItem(id);
+    }
   };
 
-  if (isLoading) {
+  const handleRemoveItem = (id: string) => {
+    if (window.confirm("Remove this item from your cart?")) {
+      removeItem(id);
+    }
+  };
+
+  const handleCheckout = () => {
+    // For prescription medicines, verify prescription first
+    if (needsPrescription) {
+      router.push("/checkout/prescription");
+    } else {
+      router.push("/checkout");
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-primary/5 p-4 flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
-          <p className="text-muted-foreground">Loading your cart...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="container mx-auto px-4 py-8 flex-grow">
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="animate-pulse flex flex-col items-center">
+              <ShoppingBag className="h-16 w-16 text-gray-300 mb-4" />
+              <p className="text-gray-500">Loading your cart...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="container mx-auto px-4 py-12 flex-grow">
+          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="mb-6">
+              <div className="inline-flex h-20 w-20 rounded-full bg-gray-100 items-center justify-center">
+                <ShoppingBag className="h-10 w-10 text-gray-400" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+            <p className="text-gray-600 mb-8">
+              Looks like you haven't added any medicines to your cart yet.
+            </p>
+            <Link href="/medicines">
+              <Button size="lg" className="px-8">
+                Browse Medicines
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary/5 p-4">
-      <div className="container mx-auto max-w-4xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Your Cart</h1>
-          <Link href="/medicines">
-            <Button variant="outline" size="sm" className="gap-2 rounded-full">
-              <ArrowLeft className="h-4 w-4" />
-              Continue Shopping
-            </Button>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center gap-3 mb-8">
+          <Link
+            href="/medicines"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-800"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" /> Continue Shopping
           </Link>
+          <h1 className="text-2xl font-bold">
+            Your Cart ({items.length} items)
+          </h1>
         </div>
 
-        {cartItems.length > 0 ? (
-          <>
-            <div className="space-y-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 md:p-6">
-                    {/* Product Image */}
-                    <div className="md:col-span-3 aspect-square bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={120}
-                        height={120}
-                        className="object-cover"
-                      />
-                    </div>
-
-                    {/* Product Details */}
-                    <div className="md:col-span-5 flex flex-col justify-between">
-                      <div>
-                        <h2 className="font-semibold text-lg">{item.name}</h2>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {item.genericName}
-                        </p>
-                        <div className="text-sm bg-primary/10 p-2 rounded-md mb-2">
-                          <p className="font-medium">Dosage: {item.dosage}</p>
-                          <p>{item.instructions}</p>
-                        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <ul className="divide-y divide-gray-200">
+                {items.map((item) => (
+                  <li key={item.id} className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="w-full sm:w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={80}
+                          height={80}
+                          className="w-full h-full object-contain"
+                        />
                       </div>
-
-                      <div className="flex items-center space-x-2 mt-4">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-full"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <span className="px-4 py-1 border rounded-md min-w-[40px] text-center">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 rounded-full"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full ml-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => removeItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <div className="mt-4">
-                        <p className="font-medium">
-                          Price (Total):{" "}
-                          <span className="text-highlight">
-                            ${(item.price * item.quantity).toFixed(2)}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Responsive: This billing info only shows on mobile */}
-                    <div className="md:hidden bg-gray-50 p-4 rounded-md">
-                      <h3 className="font-semibold mb-2">Item Summary</h3>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span>Price per unit:</span>
-                          <span>${item.price.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Quantity:</span>
-                          <span>{item.quantity}</span>
-                        </div>
-                        <div className="border-t pt-1 mt-1">
-                          <div className="flex justify-between font-semibold">
-                            <span>Item Total:</span>
-                            <span>
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </span>
+                      <div className="flex-grow">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                          <div>
+                            <h3 className="font-medium text-gray-900">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {item.genericName} • {item.dosage}
+                            </p>
+                            {item.prescription && (
+                              <span className="inline-block bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-md mt-1">
+                                Requires prescription
+                              </span>
+                            )}
+                            {item.instructions && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                {item.instructions}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex flex-row sm:flex-col items-center sm:items-end gap-4 sm:gap-2">
+                            <div className="font-medium">
+                              {formatPrice(item.price)}
+                            </div>
+                            <div className="flex items-center border border-gray-300 rounded-md">
+                              <button
+                                className="px-2 py-1 text-gray-600 hover:text-gray-800"
+                                onClick={() =>
+                                  handleDecreaseQuantity(item.id, item.quantity)
+                                }
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <span className="px-4 py-1 text-center w-10">
+                                {item.quantity}
+                              </span>
+                              <button
+                                className="px-2 py-1 text-gray-600 hover:text-gray-800"
+                                onClick={() =>
+                                  handleIncreaseQuantity(item.id, item.quantity)
+                                }
+                                aria-label="Increase quantity"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Desktop: Full cart summary shown on the right */}
-                    <div className="hidden md:block md:col-span-4 bg-gray-50 p-4 rounded-md">
-                      <h3 className="font-semibold mb-4">Billing</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Subtotal:</span>
-                          <span>${subtotal.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Shipping:</span>
-                          <span>
-                            {shipping === 0
-                              ? "Free"
-                              : `$${shipping.toFixed(2)}`}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Tax:</span>
-                          <span>${tax.toFixed(2)}</span>
-                        </div>
-                        <div className="border-t pt-2 mt-2">
-                          <div className="flex justify-between font-semibold">
-                            <span>Total:</span>
-                            <span className="text-highlight">
-                              ${total.toFixed(2)}
-                            </span>
+                        <div className="mt-4 flex justify-between items-center">
+                          <div className="text-sm font-medium text-gray-700">
+                            Subtotal: {formatPrice(item.price * item.quantity)}
                           </div>
+                          <button
+                            className="text-red-500 hover:text-red-700 text-sm flex items-center"
+                            onClick={() => handleRemoveItem(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" /> Remove
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Full summary for mobile (shown at bottom) */}
-            <div className="md:hidden bg-white rounded-lg shadow-md overflow-hidden mt-4 p-4">
-              <h3 className="font-semibold mb-4">Order Summary</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>
-                    Subtotal (
-                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
-                    items):
-                  </span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping:</span>
-                  <span>
-                    {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax:</span>
-                  <span>${tax.toFixed(2)}</span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between font-semibold">
-                    <span>Total:</span>
-                    <span className="text-highlight">${total.toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="mt-4 flex justify-between items-center">
+              <button
+                className="text-sm text-gray-600 hover:text-gray-800"
+                onClick={() => clearCart()}
+              >
+                Clear cart
+              </button>
             </div>
-
-            <div className="p-6 border-t flex justify-between items-center bg-white rounded-lg shadow-md mt-4">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Free shipping on orders over $50
-                </p>
-                <p className="font-medium">
-                  Total:{" "}
-                  <span className="text-highlight">${total.toFixed(2)}</span>
-                </p>
-              </div>
-              <Link href="/checkout">
-                <Button className="rounded-full">Place Order</Button>
-              </Link>
-            </div>
-          </>
-        ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <div className="flex justify-center mb-4">
-              <ShoppingBag className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-            <p className="text-muted-foreground mb-6">
-              Looks like you haven't added any medicines to your cart yet.
-            </p>
-            <Link href="/medicines">
-              <Button className="rounded-full">Browse Medicines</Button>
-            </Link>
           </div>
-        )}
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax (18% GST)</span>
+                  <span>{formatPrice(tax)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? "Free" : formatPrice(shipping)}</span>
+                </div>
+                <div className="border-t pt-3 mt-3">
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {needsPrescription && (
+                <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-md flex items-start">
+                  <AlertCircle className="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-yellow-700">
+                    One or more items require a valid prescription. You'll need
+                    to upload it during checkout.
+                  </p>
+                </div>
+              )}
+
+              <Button className="w-full" size="lg" onClick={handleCheckout}>
+                Proceed to Checkout
+              </Button>
+
+              <div className="mt-4 text-xs text-gray-500 text-center">
+                <p>Free shipping on orders above ₹1,000</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
