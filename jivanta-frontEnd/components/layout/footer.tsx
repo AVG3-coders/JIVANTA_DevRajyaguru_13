@@ -20,28 +20,19 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-primary mt-0.5" />
                 <span className="text-sm">
-                  123 Healthcare Avenue, Medical District<br />
-                  San Francisco, CA 94103
+                  rajkot
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <PhoneCall className="h-5 w-5 text-primary" />
-                <span className="text-sm">+1 (555) 123-4567</span>
-              </div>
-              <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary" />
-                <span className="text-sm">support@jivanta.com</span>
+                <span className="text-sm">phoniex3.connect@gmail.com</span>
               </div>
             </div>
             
             <div className="flex gap-4 mt-6">
-              <Link href="https://github.com/jivanta" className="hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">
+              <Link href="https://github.com/AVG3-coders/JIVANTA_DevRajyaguru_13" className="hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
-              </Link>
-              <Link href="https://linkedin.com/company/jivanta" className="hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="h-5 w-5" />
-                <span className="sr-only">LinkedIn</span>
               </Link>
             </div>
           </div>
