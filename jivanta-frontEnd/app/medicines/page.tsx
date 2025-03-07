@@ -32,6 +32,78 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart";
 
+// Dummy data to use instead of API calls
+const dummyMedicines: Medicine[] = [
+  {
+    id: "paracetamol-500",
+    name: "Paracetamol 500mg",
+    genericName: "Acetaminophen",
+    brand: "MediCorp",
+    price: 99.99, // Price in INR
+    category: "Pain Relief",
+    prescription: false,
+    description: "Fast pain relief for headaches and fever",
+    images: [
+      "/assets/products/paracetamol-1.jpg",
+      "/assets/products/paracetamol-2.jpg",
+    ],
+    rating: 4.5,
+    dosage: "Adults: 1-2 tablets every 4-6 hours as needed",
+  },
+  {
+    id: "ibuprofen-400",
+    name: "Ibuprofen 400mg",
+    genericName: "Ibuprofen",
+    brand: "HealthPlus",
+    price: 115.0, // Price in INR
+    category: "Pain Relief",
+    prescription: false,
+    description: "Anti-inflammatory pain reliever",
+    images: ["/assets/products/ibuprofen-1.jpg"],
+    rating: 4.2,
+    dosage: "Adults: 1 tablet every 4-6 hours",
+  },
+  {
+    id: "amoxicillin-500",
+    name: "Amoxicillin 500mg",
+    genericName: "Amoxicillin",
+    brand: "PharmaCure",
+    price: 299.5, // Price in INR
+    category: "Antibiotics",
+    prescription: true,
+    description: "Broad-spectrum antibiotic for bacterial infections",
+    images: ["/assets/products/amoxicillin-1.jpg"],
+    rating: 4.8,
+    dosage: "As prescribed by your doctor",
+  },
+  {
+    id: "loratadine-10",
+    name: "Loratadine 10mg",
+    genericName: "Loratadine",
+    brand: "AllerFree",
+    price: 199.99, // Price in INR
+    category: "Allergy",
+    prescription: false,
+    description: "24-hour allergy relief without drowsiness",
+    images: ["/assets/products/loratadine-1.jpg"],
+    rating: 4.0,
+    dosage: "Adults: 1 tablet daily",
+  },
+  {
+    id: "metformin-500",
+    name: "Metformin 500mg",
+    genericName: "Metformin",
+    brand: "DiaCare",
+    price: 249.99, // Price in INR
+    category: "Diabetes",
+    prescription: true,
+    description: "For type 2 diabetes management",
+    images: ["/assets/products/metformin-1.jpg"],
+    rating: 4.7,
+    dosage: "As prescribed by your doctor",
+  },
+];
+
 export default function MedicinesPage() {
   const router = useRouter();
   const { addItem } = useCart();
@@ -41,158 +113,101 @@ export default function MedicinesPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [minRating, setMinRating] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [medicinesData, setMedicinesData] = useState<Medicine[]>([]);
-  const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [medicinesData, setMedicinesData] =
+    useState<Medicine[]>(dummyMedicines);
+  const [filteredMedicines, setFilteredMedicines] =
+    useState<Medicine[]>(dummyMedicines);
+  const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
-  
-  // Fetch medicines on load
+
+  // Extract categories and brands from dummy data
   useEffect(() => {
-    const fetchMedicines = async () => {
-      try {
-        const response = await fetch('/api/medicines');
-        if (!response.ok) {
-          throw new Error('Failed to fetch medicines');
-        }
-        const data = await response.json();
-        setMedicinesData(data);
-        setFilteredMedicines(data);
-        
-        // Extract categories and brands
-        const uniqueCategories = [...new Set(data.map((medicine: any) => medicine.category))] as string[];
-        const uniqueBrands = [...new Set(data.map((medicine: any) => medicine.brand))] as string[];
-        
-        setCategories(uniqueCategories);
-        setBrands(uniqueBrands);
-      } catch (error) {
-        console.error('Error fetching medicines:', error);
-        
-        // Fallback to local data in case API fails
-        try {
-          const fallbackResponse = await fetch('/db.json');
-          const fallbackData = await fallbackResponse.json();
-          setMedicinesData(fallbackData.medicines);
-          setFilteredMedicines(fallbackData.medicines);
-          
-          // Extract categories and brands from fallback data
-          const uniqueCategories = [...new Set(fallbackData.medicines.map((medicine: any) => medicine.category))] as string[];
-          const uniqueBrands = [...new Set(fallbackData.medicines.map((medicine: any) => medicine.brand))] as string[];
-          
-          setCategories(uniqueCategories);
-          setBrands(uniqueBrands);
-        } catch (fallbackError) {
-          console.error('Fallback data loading failed:', fallbackError);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchMedicines();
+    const uniqueCategories = [
+      ...new Set(dummyMedicines.map((medicine: any) => medicine.category)),
+    ] as string[];
+    const uniqueBrands = [
+      ...new Set(dummyMedicines.map((medicine: any) => medicine.brand)),
+    ] as string[];
+
+    setCategories(uniqueCategories);
+    setBrands(uniqueBrands);
   }, []);
-  
-  // Handle filtering with API
+
+  // Handle filtering with dummy data
   useEffect(() => {
-    const fetchFilteredMedicines = async () => {
-      if (!medicinesData.length) return;
-      
-      setIsLoading(true);
-      
-      try {
-        // Build query params
-        const params = new URLSearchParams();
-        
-        if (searchQuery) params.append('search', searchQuery);
-        if (activeCategory) params.append('category', activeCategory);
-        if (selectedBrands.length) {
-          selectedBrands.forEach(brand => params.append('brand', brand));
-        }
-        if (priceMin) params.append('minPrice', priceMin);
-        if (priceMax) params.append('maxPrice', priceMax);
-        if (minRating) params.append('minRating', minRating.toString());
-        
-        // If we have params, fetch filtered data
-        if (params.toString()) {
-          const response = await fetch(`/api/medicines?${params}`);
-          
-          if (!response.ok) {
-            throw new Error('Failed to fetch filtered medicines');
-          }
-          
-          const data = await response.json();
-          setFilteredMedicines(data);
-        } else {
-          // No filters, use all medicines
-          setFilteredMedicines(medicinesData);
-        }
-      } catch (error) {
-        console.error('Error filtering medicines:', error);
-        
-        // Fallback to client-side filtering if API fails
-        let results = [...medicinesData];
+    if (!medicinesData.length) return;
 
-        // Apply search query filter
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          results = results.filter(
-            (medicine: any) =>
-              medicine.name.toLowerCase().includes(query) ||
-              medicine.description.toLowerCase().includes(query) ||
-              medicine.brand.toLowerCase().includes(query)
-          );
-        }
+    setIsLoading(true);
 
-        // Apply category filter
-        if (activeCategory) {
-          results = results.filter(
-            (medicine: any) => medicine.category === activeCategory
-          );
-        }
+    try {
+      let results = [...medicinesData];
 
-        // Apply brand filter
-        if (selectedBrands.length > 0) {
-          results = results.filter((medicine: any) =>
-            selectedBrands.includes(medicine.brand)
-          );
-        }
-
-        // Apply price range filter
-        if (priceMin !== "") {
-          results = results.filter(
-            (medicine: any) => medicine.price >= parseFloat(priceMin)
-          );
-        }
-
-        if (priceMax !== "") {
-          results = results.filter(
-            (medicine: any) => medicine.price <= parseFloat(priceMax)
-          );
-        }
-
-        // Apply rating filter
-        if (minRating !== null) {
-          results = results.filter((medicine: any) => medicine.rating >= minRating);
-        }
-
-        setFilteredMedicines(results);
-      } finally {
-        setIsLoading(false);
+      // Apply search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        results = results.filter(
+          (medicine: any) =>
+            medicine.name.toLowerCase().includes(query) ||
+            medicine.description.toLowerCase().includes(query) ||
+            medicine.brand.toLowerCase().includes(query)
+        );
       }
-    };
-    
-    // Add delay for typing
-    const timer = setTimeout(() => {
-      fetchFilteredMedicines();
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [searchQuery, activeCategory, selectedBrands, priceMin, priceMax, minRating, medicinesData]);
+
+      // Apply category filter
+      if (activeCategory) {
+        results = results.filter(
+          (medicine: any) => medicine.category === activeCategory
+        );
+      }
+
+      // Apply brand filter
+      if (selectedBrands.length > 0) {
+        results = results.filter((medicine: any) =>
+          selectedBrands.includes(medicine.brand)
+        );
+      }
+
+      // Apply price range filter
+      if (priceMin !== "") {
+        results = results.filter(
+          (medicine: any) => medicine.price >= parseFloat(priceMin)
+        );
+      }
+
+      if (priceMax !== "") {
+        results = results.filter(
+          (medicine: any) => medicine.price <= parseFloat(priceMax)
+        );
+      }
+
+      // Apply rating filter
+      if (minRating !== null) {
+        results = results.filter(
+          (medicine: any) => medicine.rating >= minRating
+        );
+      }
+
+      setFilteredMedicines(results);
+    } catch (error) {
+      console.error("Error filtering medicines:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    searchQuery,
+    activeCategory,
+    selectedBrands,
+    priceMin,
+    priceMax,
+    minRating,
+    medicinesData,
+  ]);
 
   // Rest of your code remains the same
-  
+
   // Format price to Indian Rupees
   const formatIndianPrice = (price: number): string => {
     return new Intl.NumberFormat("en-IN", {
@@ -201,7 +216,7 @@ export default function MedicinesPage() {
       maximumFractionDigits: 2,
     }).format(price);
   };
-  
+
   // Handle brand selection
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -226,9 +241,16 @@ export default function MedicinesPage() {
       id: medicine.id,
       name: medicine.name,
       genericName: medicine.genericName || medicine.name.split(" ")[0],
-      image: medicine.images?.[0] || medicine.image || "/assets/medicines/medicine.jpeg",
+      image:
+        medicine.images?.[0] ||
+        medicine.image ||
+        "/assets/medicines/medicine.jpeg",
       price: medicine.price,
-      dosage: medicine.dosage || (medicine.name.split(" ").length > 1 ? medicine.name.split(" ")[1] : ""),
+      dosage:
+        medicine.dosage ||
+        (medicine.name.split(" ").length > 1
+          ? medicine.name.split(" ")[1]
+          : ""),
       prescription: medicine.prescription || false,
     });
 
@@ -248,7 +270,7 @@ export default function MedicinesPage() {
 
   // The JSX render remains mostly the same
   // Just ensure image paths are correctly referenced
-  
+
   return (
     // Your existing JSX with fixed image references
     <div className="min-h-screen bg-primary/5">
@@ -424,8 +446,8 @@ export default function MedicinesPage() {
                       <div className="aspect-square relative bg-gray-100">
                         <Image
                           src={
-                            medicine.images?.[0] || 
-                            medicine.image || 
+                            medicine.images?.[0] ||
+                            medicine.image ||
                             "/assets/medicines/medicine.jpeg"
                           }
                           alt={medicine.name}
